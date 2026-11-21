@@ -48,12 +48,14 @@ module pe_tb;
 
         repeat (3) @(posedge clk);
         rst_n = 1'b1;
-        @(posedge clk);
 
         // clear
+        @(posedge clk);
         clear = 1'b1;
+
         @(posedge clk);
         clear = 1'b0;
+
         @(posedge clk);
         check("after clear", acc, 0);
 
@@ -61,8 +63,10 @@ module pe_tb;
         a_in   = 8'sd3;
         b_in   = 8'sd4;
         enable = 1'b1;
+
         @(posedge clk);
         enable = 1'b0;
+
         @(posedge clk);
         check("3*4", acc, 32'sd12);
         check("a forward", a_out, 8'sd3);
@@ -72,6 +76,7 @@ module pe_tb;
         a_in   = -8'sd2;
         b_in   = 8'sd5;
         enable = 1'b1;
+
         @(posedge clk);
         enable = 1'b0;
         @(posedge clk);
@@ -84,12 +89,25 @@ module pe_tb;
         @(posedge clk);
         check("clear again", acc, 0);
 
+        repeat (3) @(posedge clk);
+
+        rst_n = 1'b0;
+        @(posedge clk);
+        check("after reset", acc, 0);
+        check("a forward after reset", a_out, 0);
+        check("b forward after reset", b_out, 0);
+
         if (errors == 0)
             $display("pe_tb: ALL PASS");
         else
             $display("pe_tb: %0d FAIL(s)", errors);
 
         $finish;
+    end
+
+    initial begin
+        $dumpfile("waves/pe_tb.vcd");
+        $dumpvars(0, pe_tb);
     end
 
 endmodule
